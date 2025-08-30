@@ -30,8 +30,8 @@ RUN bash -c "mkdir build && \
                  source ../velox/scripts/setup-centos-adapters.sh && \
                  install_adapters && \
                  install_clang15 && \
-                 install_ucx && \
-                 install_cuda 12.8) && \
+                 install_cuda 12.8 && \
+                 install_ucx) && \
     rm -rf build"
 
 # put CUDA binaries on the PATH
