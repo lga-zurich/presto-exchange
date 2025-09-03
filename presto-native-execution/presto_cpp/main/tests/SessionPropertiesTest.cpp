@@ -69,6 +69,8 @@ TEST_F(SessionPropertiesTest, validateMapping) {
        core::QueryConfig::kDebugDisableExpressionWithLazyInputs},
       {SessionProperties::kDebugMemoryPoolNameRegex,
        core::QueryConfig::kDebugMemoryPoolNameRegex},
+      {SessionProperties::kDebugMemoryPoolWarnThresholdBytes,
+       core::QueryConfig::kDebugMemoryPoolWarnThresholdBytes},
       {SessionProperties::kSelectiveNimbleReaderEnabled,
        core::QueryConfig::kSelectiveNimbleReaderEnabled},
       {SessionProperties::kQueryTraceEnabled,
@@ -117,7 +119,13 @@ TEST_F(SessionPropertiesTest, validateMapping) {
       {SessionProperties::kNativeQueryMemoryReclaimerPriority,
        core::QueryConfig::kQueryMemoryReclaimerPriority},
       {SessionProperties::kMaxNumSplitsListenedTo,
-       core::QueryConfig::kMaxNumSplitsListenedTo}};
+       core::QueryConfig::kMaxNumSplitsListenedTo},
+      {SessionProperties::kIndexLookupJoinMaxPrefetchBatches,
+       core::QueryConfig::kIndexLookupJoinMaxPrefetchBatches},
+      {SessionProperties::kIndexLookupJoinSplitOutput,
+       core::QueryConfig::kIndexLookupJoinSplitOutput},
+      {SessionProperties::kUnnestSplitOutput,
+       core::QueryConfig::kUnnestSplitOutput}};
 
   const auto& sessionProperties =
       SessionProperties::instance()->testingSessionProperties();

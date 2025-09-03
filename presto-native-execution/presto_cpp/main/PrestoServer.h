@@ -208,6 +208,8 @@ class PrestoServer {
 
   void reportNodeStatus(proxygen::ResponseHandler* downstream);
 
+  void reportNodeStats(proxygen::ResponseHandler* downstream);
+
   void handleGracefulShutdown(
       const std::vector<std::unique_ptr<folly::IOBuf>>& body,
       proxygen::ResponseHandler* downstream);
@@ -226,6 +228,8 @@ class PrestoServer {
   std::unique_ptr<velox::cache::SsdCache> setupSsdCache();
 
   void checkOverload();
+
+  virtual void createTaskManager();
 
   const std::string configDirectoryPath_;
 

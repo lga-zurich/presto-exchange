@@ -22,6 +22,7 @@ import com.facebook.presto.spark.classloader_interface.PrestoSparkFatalException
 import com.facebook.presto.spark.execution.http.PrestoSparkHttpServerClient;
 import com.facebook.presto.spark.execution.http.server.RequestErrorTracker;
 import com.facebook.presto.spark.execution.http.server.smile.BaseResponse;
+import com.facebook.presto.spark.execution.property.NativeExecutionSystemConfig;
 import com.facebook.presto.spark.execution.property.WorkerProperty;
 import com.facebook.presto.spi.PrestoException;
 import com.google.common.annotations.VisibleForTesting;
@@ -92,7 +93,7 @@ public class NativeExecutionProcess
     private final Executor executor;
     private final RequestErrorTracker errorTracker;
     private final OkHttpClient httpClient;
-    private final WorkerProperty<?, ?, ?, ?> workerProperty;
+    private final WorkerProperty<?, ?, ?> workerProperty;
 
     private volatile Process process;
     private volatile ProcessOutputPipe processOutputPipe;
@@ -106,7 +107,7 @@ public class NativeExecutionProcess
             ScheduledExecutorService scheduledExecutorService,
             JsonCodec<ServerInfo> serverInfoCodec,
             Duration maxErrorDuration,
-            WorkerProperty<?, ?, ?, ?> workerProperty)
+            WorkerProperty<?, ?, ?> workerProperty)
             throws IOException
     {
         this.executablePath = requireNonNull(executablePath, "executablePath is null");
@@ -337,11 +338,13 @@ public class NativeExecutionProcess
         // there is no port isolation among all the containers running on the same host, so we have
         // to pick unique port per worker to avoid port collision. This config will be passed down to
         // the native execution process eventually for process initialization.
-        workerProperty.getSystemConfig().setHttpServerPort(port);
+        workerProperty.getSystemConfig()
+                .update(NativeExecutionSystemConfig.HTTP_SERVER_HTTP_PORT, String.valueOf(port));
         workerProperty.populateAllProperties(
                 Paths.get(configBasePath, WORKER_CONFIG_FILE),
                 Paths.get(configBasePath, WORKER_NODE_CONFIG_FILE),
-                Paths.get(configBasePath, format("%s%s.properties", WORKER_CONNECTOR_CONFIG_FILE, getNativeExecutionCatalogName(session))));
+                Paths.get(configBasePath, format("%s%s.properties", WORKER_CONNECTOR_CONFIG_FILE,
+                    getNativeExecutionCatalogName(session))));
     }
 
     private void doGetServerInfo(SettableFuture<ServerInfo> future)

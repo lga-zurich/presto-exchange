@@ -26,6 +26,7 @@ import com.facebook.presto.common.function.OperatorType;
 import com.facebook.presto.common.predicate.TupleDomain;
 import com.facebook.presto.common.type.Type;
 import com.facebook.presto.common.type.TypeSignature;
+import com.facebook.presto.metadata.Catalog.CatalogContext;
 import com.facebook.presto.spi.ColumnHandle;
 import com.facebook.presto.spi.ColumnMetadata;
 import com.facebook.presto.spi.ConnectorDeleteTableHandle;
@@ -243,7 +244,7 @@ public class MetadataManager
     {
         BlockEncodingManager blockEncodingManager = new BlockEncodingManager();
         return new MetadataManager(
-                new FunctionAndTypeManager(transactionManager, blockEncodingManager, featuresConfig, functionsConfig, new HandleResolver(), ImmutableSet.of()),
+                new FunctionAndTypeManager(transactionManager, new TableFunctionRegistry(), blockEncodingManager, featuresConfig, functionsConfig, new HandleResolver(), ImmutableSet.of()),
                 blockEncodingManager,
                 createTestingSessionPropertyManager(),
                 new SchemaPropertyManager(),
@@ -300,6 +301,12 @@ public class MetadataManager
     public void registerBuiltInFunctions(List<? extends SqlFunction> functionInfos)
     {
         functionAndTypeManager.registerBuiltInFunctions(functionInfos);
+    }
+
+    @Override
+    public void registerConnectorFunctions(String catalogName, List<? extends SqlFunction> functionInfos)
+    {
+        functionAndTypeManager.registerConnectorFunctions(catalogName, functionInfos);
     }
 
     @Override
@@ -979,6 +986,12 @@ public class MetadataManager
     public Map<String, ConnectorId> getCatalogNames(Session session)
     {
         return transactionManager.getCatalogNames(session.getRequiredTransactionId());
+    }
+
+    @Override
+    public Map<String, CatalogContext> getCatalogNamesWithConnectorContext(Session session)
+    {
+        return transactionManager.getCatalogNamesWithConnectorContext(session.getRequiredTransactionId());
     }
 
     @Override

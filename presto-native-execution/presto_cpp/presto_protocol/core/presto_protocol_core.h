@@ -829,8 +829,14 @@ void to_json(json& j, const BufferInfo& p);
 void from_json(const json& j, BufferInfo& p);
 } // namespace facebook::presto::protocol
 namespace facebook::presto::protocol {
+enum class BuiltInFunctionKind { ENGINE, PLUGIN };
+extern void to_json(json& j, const BuiltInFunctionKind& e);
+extern void from_json(const json& j, BuiltInFunctionKind& e);
+} // namespace facebook::presto::protocol
+namespace facebook::presto::protocol {
 struct BuiltInFunctionHandle : public FunctionHandle {
   Signature signature = {};
+  BuiltInFunctionKind builtInFunctionKind = {};
 
   BuiltInFunctionHandle() noexcept;
 };
@@ -1755,6 +1761,30 @@ void to_json(json& j, const MergeJoinNode& p);
 void from_json(const json& j, MergeJoinNode& p);
 } // namespace facebook::presto::protocol
 namespace facebook::presto::protocol {
+struct NodeLoadMetrics {
+  double cpuUsedPercent = {};
+  double memoryUsedInBytes = {};
+  int numQueuedDrivers = {};
+  bool cpuOverload = {};
+  bool memoryOverload = {};
+};
+void to_json(json& j, const NodeLoadMetrics& p);
+void from_json(const json& j, NodeLoadMetrics& p);
+} // namespace facebook::presto::protocol
+namespace facebook::presto::protocol {
+enum class NodeState { ACTIVE, INACTIVE, SHUTTING_DOWN };
+extern void to_json(json& j, const NodeState& e);
+extern void from_json(const json& j, NodeState& e);
+} // namespace facebook::presto::protocol
+namespace facebook::presto::protocol {
+struct NodeStats {
+  NodeState nodeState = {};
+  std::shared_ptr<NodeLoadMetrics> loadMetrics = {};
+};
+void to_json(json& j, const NodeStats& p);
+void from_json(const json& j, NodeStats& p);
+} // namespace facebook::presto::protocol
+namespace facebook::presto::protocol {
 struct NodeVersion {
   String version = {};
 };
@@ -2520,9 +2550,4 @@ struct WindowNode : public PlanNode {
 };
 void to_json(json& j, const WindowNode& p);
 void from_json(const json& j, WindowNode& p);
-} // namespace facebook::presto::protocol
-namespace facebook::presto::protocol {
-enum class NodeState { ACTIVE, INACTIVE, SHUTTING_DOWN };
-extern void to_json(json& j, const NodeState& e);
-extern void from_json(const json& j, NodeState& e);
 } // namespace facebook::presto::protocol
