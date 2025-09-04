@@ -1,4 +1,4 @@
 [submodule "presto-native-execution/velox"]
 	path = presto-native-execution/velox
-	url = https://github.com/dan13bauer/velox.git
+	url = https://github.com/lga-zurich/velox-exchange.git
 	branch = cudf_parquet_reader
