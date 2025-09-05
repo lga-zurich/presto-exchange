@@ -16,7 +16,7 @@ ENV PROMPT_ALWAYS_RESPOND=n
 ENV CC=/opt/rh/gcc-toolset-12/root/bin/gcc
 ENV CXX=/opt/rh/gcc-toolset-12/root/bin/g++
 ENV CUDA_VERSION="12.8"
-ENV UCX_VERSION="1.18.0"
+ENV UCX_VERSION="1.18.1"
 
 RUN mkdir -p /scripts /velox/scripts
 COPY scripts /scripts
