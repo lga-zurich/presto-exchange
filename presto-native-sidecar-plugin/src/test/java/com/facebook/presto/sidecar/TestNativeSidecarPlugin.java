@@ -220,6 +220,7 @@ public class TestNativeSidecarPlugin
                 "date_trunc('second', from_unixtime(orderkey, '+00:00')) FROM orders");
         assertQuery("SELECT mod(orderkey, linenumber) FROM lineitem");
         assertQueryFails("SELECT IF(true, 0/0, 1)", "[\\s\\S]*/ by zero native.default.fail[\\s\\S]*");
+        assertQuery("select CASE WHEN true THEN 'Yes' ELSE 'No' END");
     }
 
     @Test
@@ -335,10 +336,29 @@ public class TestNativeSidecarPlugin
     }
 
     @Test
+    public void testMapSubset()
+    {
+        assertQuery("select m[1], m[3] from (select map_subset(map(array[1,2,3,4], array['a', 'b', 'c', 'd']), array[1,3,10]) m)", "select 'a', 'c'");
+        assertQuery("select m['p'], m['r'] from (select map_subset(map(array['p', 'q', 'r', 's'], array['a', 'b', 'c', 'd']), array['p', 'r', 'z']) m)", "select 'a', 'c'");
+        assertQuery("select m[true], m[false] from (select map_subset(map(array[false, true], array['a', 'z']), array[true, false]) m)", "select 'z', 'a'");
+        assertQuery("select m[DATE '2015-01-01'], m[DATE '2015-01-13'] from (select map_subset(" +
+                "map(array[DATE '2015-01-01', DATE '2015-02-13', DATE '2015-01-13', DATE '2015-05-15'], array['a', 'b', 'c', 'd']), " +
+                "array[DATE '2015-01-01', DATE '2015-01-13', DATE '2015-06-15']) m)", "select 'a', 'c'");
+        assertQuery("select m[TIMESTAMP '2021-01-02 09:04:05.321'] from (select map_subset(" +
+                "map(array[TIMESTAMP '2021-01-02 09:04:05.321', TIMESTAMP '2022-12-22 10:07:08.456'], array['a', 'b']), " +
+                "array[TIMESTAMP '2021-01-02 09:04:05.321', TIMESTAMP '2022-12-22 10:07:09.246']) m)", "select 'a'");
+    }
+
+    @Test
     public void testInformationSchemaTables()
     {
         assertQuery("select lower(table_name) from information_schema.tables "
                 + "where table_name = 'lineitem' or table_name = 'LINEITEM' ");
+        assertQuery("SELECT table_name, CASE WHEN abs(ordinal_position) > 3 THEN 'high' WHEN abs(ordinal_position) > 1 THEN 'medium' ELSE 'low' END as position_category, COUNT(*) \n" +
+                "FROM information_schema.columns " +
+                "WHERE table_catalog = 'hive' AND table_name IN ('nation', 'region', 'lineitem', 'orders') " +
+                "GROUP BY table_name, CASE WHEN abs(ordinal_position) > 3 THEN 'high' WHEN abs(ordinal_position) > 1 THEN 'medium' ELSE 'low' END " +
+                "ORDER BY table_name, position_category");
     }
 
     @Test
@@ -412,7 +432,7 @@ public class TestNativeSidecarPlugin
         assertQuery("SELECT " +
                 "ST_DISTANCE(ST_POINT(a.nationkey, a.regionkey), ST_POINT(b.nationkey, b.regionkey)) " +
                 "FROM nation a JOIN nation b ON a.nationkey < b.nationkey");
-        assertQueryFails(
+        assertQuery(
                 "WITH regions(name, geom) AS (VALUES" +
                         "        ('A', ST_GeometryFromText('POLYGON ((0 0, 0 5, 5 5, 5 0, 0 0))'))," +
                         "        ('B', ST_GeometryFromText('POLYGON ((5 0, 5 5, 10 5, 10 0, 5 0))')))," +
@@ -420,8 +440,7 @@ public class TestNativeSidecarPlugin
                         "        ('P1', ST_Point(1, 1))," +
                         "        ('P2', ST_Point(6, 1))," +
                         "        ('P3', ST_Point(8, 4)))" +
-                        "SELECT p.id, r.name FROM points p LEFT JOIN regions r ON ST_Within(p.geom, r.geom)",
-                "Error from native plan checker: .SpatialJoinNode no abstract type PlanNode ");
+                        "SELECT p.id, r.name FROM points p LEFT JOIN regions r ON ST_Within(p.geom, r.geom)");
     }
 
     @Test
