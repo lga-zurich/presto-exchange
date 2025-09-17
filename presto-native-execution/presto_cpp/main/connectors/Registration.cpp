@@ -20,7 +20,7 @@
 #endif
 
 #ifdef PRESTO_ENABLE_CUDF
-#include "velox/experimental/cudf/connectors/parquet/CudfHiveConnector.h"
+#include "velox/experimental/cudf/connectors/hive/CudfHiveConnector.h"
 #endif
 
 #include "velox/connectors/hive/HiveConnector.h"
@@ -39,9 +39,9 @@ void registerConnectorFactories() {
   if (!velox::connector::hasConnectorFactory(
           velox::connector::hive::HiveConnectorFactory::kHiveConnectorName)) {
     velox::connector::registerConnectorFactory(
-        std::make_shared<facebook::velox::cudf_velox::connector::parquet::CudfHiveConnectorFactory>());
+        std::make_shared<facebook::velox::cudf_velox::connector::hive::CudfHiveConnectorFactory>());
     velox::connector::registerConnectorFactory(
-        std::make_shared<facebook::velox::cudf_velox::connector::parquet::CudfHiveConnectorFactory>(
+        std::make_shared<facebook::velox::cudf_velox::connector::hive::CudfHiveConnectorFactory>(
             kHiveHadoop2ConnectorName));
   }
 #else
