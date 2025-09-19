@@ -32,6 +32,7 @@ RUN --mount=type=cache,target=/root/.ccache,sharing=locked \
     ccache -sz -v
 RUN !(LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd /prestissimo/${BUILD_BASE_DIR}/${BUILD_DIR}/presto_cpp/main/presto_server  | grep "not found") && \
     LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd /prestissimo/${BUILD_BASE_DIR}/${BUILD_DIR}/presto_cpp/main/presto_server | awk 'NF == 4 { system("cp " $3 " /runtime-libraries") }'
+RUN cp /usr/local/cuda/targets/x86_64-linux/lib/libcufile.so* /runtime-libraries
 
 #/////////////////////////////////////////////
 #          prestissimo-runtime
