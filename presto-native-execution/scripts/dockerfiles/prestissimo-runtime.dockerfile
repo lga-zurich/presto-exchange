@@ -31,9 +31,10 @@ RUN --mount=type=cache,target=/root/.ccache,sharing=locked \
     EXTRA_CMAKE_FLAGS=${EXTRA_CMAKE_FLAGS} \
     NUM_THREADS=${NUM_THREADS} make --directory="/prestissimo/" cmake-and-build BUILD_TYPE=${BUILD_TYPE} BUILD_DIR=${BUILD_DIR} BUILD_BASE_DIR=${BUILD_BASE_DIR} && \
     ccache -sz -v
-RUN !(LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd /prestissimo/${BUILD_BASE_DIR}/${BUILD_DIR}/presto_cpp/main/presto_server  | grep "not found") && \
-    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd /prestissimo/${BUILD_BASE_DIR}/${BUILD_DIR}/presto_cpp/main/presto_server | awk 'NF == 4 { system("cp " $3 " /runtime-libraries") }'
+RUN !(LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64:/usr/local/cuda/compat ldd /prestissimo/${BUILD_BASE_DIR}/${BUILD_DIR}/presto_cpp/main/presto_server  | grep "not found") && \
+    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64:/usr/local/cuda/compat ldd /prestissimo/${BUILD_BASE_DIR}/${BUILD_DIR}/presto_cpp/main/presto_server | awk 'NF == 4 { system("cp " $3 " /runtime-libraries") }'
 RUN cp -rf /usr/local/cuda/targets/x86_64-linux/lib /runtime-libraries/cuda
+RUN cp -rf /usr/local/lib/ucx /runtime-libraries/ucx
 
 #/////////////////////////////////////////////
 #          prestissimo-runtime
@@ -51,5 +52,6 @@ COPY --chmod=0775 ./entrypoint.sh /opt/entrypoint.sh
 RUN dnf install -y librdmacm libibverbs
 RUN echo "/usr/lib64/prestissimo-libs" > /etc/ld.so.conf.d/prestissimo.conf && ldconfig
 RUN echo "/usr/lib64/prestissimo-libs/cuda" >> /etc/ld.so.conf.d/cuda.conf && ldconfig
+RUN echo "/usr/lib64/prestissimo-libs/ucx" >> /etc/ld.so.conf.d/prestissimo.conf && ldconfig
 
 ENTRYPOINT ["/opt/entrypoint.sh"]
