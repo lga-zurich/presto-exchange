@@ -29,6 +29,7 @@
 #include "velox/connectors/tpch/TpchConnector.h"
 #include "velox/connectors/tpch/TpchConnectorSplit.h"
 #include "velox/type/Filter.h"
+#include "velox/experimental/cudf/exec/ToCudf.h"
 
 namespace facebook::presto {
 
