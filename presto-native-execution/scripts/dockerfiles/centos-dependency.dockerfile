@@ -21,7 +21,7 @@ ENV CC=/opt/rh/gcc-toolset-12/root/bin/gcc
 ENV CXX=/opt/rh/gcc-toolset-12/root/bin/g++
 ENV ARM_BUILD_TARGET=${ARM_BUILD_TARGET}
 ENV CUDA_VERSION="12.8"
-ENV UCX_VERSION="1.18.0"
+ENV UCX_VERSION="1.19.0"
 
 RUN mkdir -p /scripts /velox/scripts
 COPY scripts /scripts
