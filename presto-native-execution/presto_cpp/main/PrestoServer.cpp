@@ -71,6 +71,7 @@
 #ifdef PRESTO_ENABLE_CUDF
 #include "velox/experimental/cudf/CudfConfig.h"
 #include "velox/experimental/cudf/exec/ToCudf.h"
+#include "velox/velox/experimental/cudf-exchange/Communicator.h"
 #endif
 
 #ifdef PRESTO_ENABLE_REMOTE_FUNCTIONS
@@ -169,6 +170,11 @@ void registerVeloxCudf() {
         systemConfig->values());
     if (velox::cudf_velox::CudfConfig::getInstance().enabled) {
       velox::cudf_velox::registerCudf();
+      auto server = facebook::velox::cudf_exchange::Communicator::initAndGet(SystemConfig::instance()->cudfServerPort());
+      std::thread serverThread(
+          &facebook::velox::cudf_exchange::Communicator::run, server.get());
+      serverThread.detach();
+      
       PRESTO_STARTUP_LOG(INFO) << "cuDF is registered.";
     }
   }
