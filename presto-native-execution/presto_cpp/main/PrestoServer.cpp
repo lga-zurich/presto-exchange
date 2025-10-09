@@ -160,16 +160,16 @@ bool isSharedLibrary(const fs::path& path) {
 void registerVeloxCudf() {
 #ifdef PRESTO_ENABLE_CUDF
   // Disable by default.
-  velox::cudf_velox::CudfConfig::getInstance().enabled = false;
+  facebook::velox::cudf_velox::CudfConfig::getInstance().enabled = false;
   auto systemConfig = SystemConfig::instance();
   velox::cudf_velox::CudfConfig::getInstance().functionNamePrefix =
       systemConfig->prestoDefaultNamespacePrefix();
   if (systemConfig->values().contains(
-          velox::cudf_velox::CudfConfig::kCudfEnabled)) {
-    velox::cudf_velox::CudfConfig::getInstance().initialize(
+          facebook::velox::cudf_velox::CudfConfig::kCudfEnabled)) {
+    facebook::velox::cudf_velox::CudfConfig::getInstance().initialize(
         systemConfig->values());
-    if (velox::cudf_velox::CudfConfig::getInstance().enabled) {
-      velox::cudf_velox::registerCudf();
+    if (facebook::velox::cudf_velox::CudfConfig::getInstance().enabled) {
+      facebook::velox::cudf_velox::registerCudf();
       auto server = facebook::velox::cudf_exchange::Communicator::initAndGet(SystemConfig::instance()->cudfServerPort());
       std::thread serverThread(
           &facebook::velox::cudf_exchange::Communicator::run, server.get());
@@ -185,9 +185,9 @@ void unregisterVeloxCudf() {
 #ifdef PRESTO_ENABLE_CUDF
   auto systemConfig = SystemConfig::instance();
   if (systemConfig->values().contains(
-          velox::cudf_velox::CudfConfig::kCudfEnabled) &&
-      velox::cudf_velox::CudfConfig::getInstance().enabled) {
-    velox::cudf_velox::unregisterCudf();
+          facebook::velox::cudf_velox::CudfConfig::kCudfEnabled) &&
+      facebook::velox::cudf_velox::CudfConfig::getInstance().enabled) {
+    facebook::velox::cudf_velox::unregisterCudf();
     PRESTO_SHUTDOWN_LOG(INFO) << "cuDF is unregistered.";
   }
 #endif
