@@ -95,6 +95,21 @@ void registerConnectorFactories() {
   facebook::presto::registerConnectorFactory(
       std::make_shared<
           facebook::velox::connector::tpcds::TpcdsConnectorFactory>());
+#ifdef PRESTO_ENABLE_CUDF
+  facebook::presto::unregisterConnectorFactory(
+      facebook::velox::connector::hive::HiveConnectorFactory::kHiveConnectorName);
+  facebook::presto::unregisterConnectorFactory(kHiveHadoop2ConnectorName);
+
+  // Register cuDF Hive connector factory
+  facebook::presto::registerConnectorFactory(
+      std::make_shared<facebook::velox::cudf_velox::connector::hive::
+                           CudfHiveConnectorFactory>());
+
+  // Register cudf Hive connector factory
+  facebook::presto::registerConnectorFactory(
+      std::make_shared<facebook::velox::cudf_velox::connector::hive::
+                           CudfHiveConnectorFactory>(kHiveHadoop2ConnectorName));
+#endif
 
   // Register TPCH connector factory
   facebook::presto::registerConnectorFactory(
