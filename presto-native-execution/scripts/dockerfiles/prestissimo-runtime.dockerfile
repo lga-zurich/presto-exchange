@@ -47,6 +47,9 @@ ENV BUILD_DIR=""
 
 COPY --chmod=0775 --from=prestissimo-image /prestissimo/${BUILD_BASE_DIR}/${BUILD_DIR}/presto_cpp/main/presto_server /usr/bin/
 COPY --chmod=0775 --from=prestissimo-image /runtime-libraries/* /usr/lib64/prestissimo-libs/
+COPY --chmod=0775 --from=prestissimo-image /runtime-libraries/ucx /usr/lib64/prestissimo-libs/ucx
+COPY --chmod=0775 --from=prestissimo-image /runtime-libraries/cuda /usr/lib64/prestissimo-libs/cuda
+COPY --chmod=0755 ./etc /opt/presto-server/etc
 COPY --chmod=0755 ./etc /opt/presto-server/etc
 COPY --chmod=0775 ./entrypoint.sh /opt/entrypoint.sh
 RUN echo "/usr/lib64/prestissimo-libs" > /etc/ld.so.conf.d/prestissimo.conf && ldconfig
